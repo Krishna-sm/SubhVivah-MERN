@@ -4,8 +4,8 @@ const router = express.Router()
 
 const routes = [
     {
-        path:'/test',
-        route:require("./test.route")
+        path:'/auth',
+        route:require("./auth.route")
     }
 ]
 

@@ -5,8 +5,12 @@ import { FaEyeSlash } from "react-icons/fa6";
 import * as yup from 'yup'
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import { Link } from 'react-router';
+import { AxiosClient } from '../../config/axiosClient';
+import { toast } from 'react-toastify';
+import { CgSpinner } from 'react-icons/cg';
 const LoginPage = () => {
     const [isHide,setIsHide] = useState(true)
+    const [loading,setLoading] = useState(false)
 
 
         interface LoginFormType{
@@ -26,14 +30,25 @@ const LoginPage = () => {
                 .min(8, 'Password must be at least 8 characters long')
                 .required('Password is required'),
         })
-        const onSubmitHandler=(e:LoginFormType,helper:FormikHelpers<LoginFormType>)=>{
+        const onSubmitHandler=async (e:LoginFormType,helper:FormikHelpers<LoginFormType>)=>{
            try {
-                console.log(e);
+            setLoading(true)
+                const response = await AxiosClient.post("/auth/login",e);
+
+                const data = await response.data;
+
+                console.log(data);
+                toast.success(data.msg)
+
+                // token save in local storage
+                // fetch user profile and save in reducer
+                
                 helper.resetForm();
+           } catch (error:any) {
+                toast.error(error.response.data.error);
                 
-           } catch (error) {
-                console.log(error);
-                
+           }finally{
+            setLoading(false)
            }
         }
 
@@ -68,7 +83,7 @@ const LoginPage = () => {
                    <ErrorMessage className='text-red-500 text-sm' component={'p'} name='password'/>
                         </div>
                    <div className="mb-3">
-                    <button type='submit' className="w-full rounded-md border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-white border py-4 font-[PoppinSemibold]">Login</button>
+                    <button disabled={loading} type='submit' className="w-full rounded-md border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-white border flex items-center justify-center gap-x-3 py-4 font-[PoppinSemibold]">Login{loading && <CgSpinner className='text-3xl animate-spin text-white' />} </button>
                    </div> 
                    <div className="mb-3">
                     <p className="text-center">
